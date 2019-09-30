@@ -1,4 +1,6 @@
 ## Introduction
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ftenta-browser%2Fcrosswalk.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Ftenta-browser%2Fcrosswalk?ref=badge_shield)
+
 
 Crosswalk is an app runtime based on Chromium/Blink.
 
@@ -20,3 +22,6 @@ We are also on IRC: `#crosswalk` @ `chat.freenode.net`
 ## License
 
 Crosswalk's code uses the 3-clause BSD license, see our `LICENSE` file.
+
+
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Ftenta-browser%2Fcrosswalk.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Ftenta-browser%2Fcrosswalk?ref=badge_large)
