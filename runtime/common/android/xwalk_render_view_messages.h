@@ -132,10 +132,11 @@ IPC_SYNC_MESSAGE_CONTROL5_1(XWalkViewHostMsg_ShouldOverrideUrlLoading, // NOLINT
                             bool /* in - is_redirect */,
                             bool /* in - is_main_frame */,
                             bool /* out - result */)
-IPC_SYNC_MESSAGE_CONTROL3_2(XWalkViewHostMsg_WillSendRequest, // NOLINT(*)
+IPC_SYNC_MESSAGE_CONTROL4_2(XWalkViewHostMsg_WillSendRequest, // NOLINT(*)
                             int /* render_frame_id id */,
                             std::string /* in - url */,
                             ui::PageTransition /*in - transition_type */,
+                            bool /*in - isMainFrame*/,
                             std::string /* out - new url*/,
                             bool /* out - did_overwrite*/)
 // Sent when a subframe is created.

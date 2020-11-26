@@ -3,12 +3,17 @@ package com.tenta.xwalk.refactor;
 public class RewriteUrlValue {
     private String url;
     private int transitionType;
+    private boolean isMainFrame;
     
-    private void nativeInit(String url, int trType) {
+    private void nativeInit(boolean isMainFrame, String url, int trType) {
+        this.isMainFrame = isMainFrame;
         this.url = url;
         this.transitionType = trType;
     }
     
+    public boolean isMainFrame() {
+        return this.isMainFrame;
+    }
     public String getUrl() {
         return url;
     }

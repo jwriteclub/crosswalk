@@ -101,6 +101,7 @@ void XWalkRenderMessageFilter::OnShouldOverrideUrlLoading(int render_frame_id,
 
 void XWalkRenderMessageFilter::OnWillSendRequest(int render_frame_id, const std::string& url,
                                                  ui::PageTransition transition_type,
+                                                 bool isMainFrame,
                                                  std::string* new_url,
                                                  bool* did_overwrite) {
   // TODO(iotto) check new_url/did_overwrite for null
@@ -109,7 +110,7 @@ void XWalkRenderMessageFilter::OnWillSendRequest(int render_frame_id, const std:
       XWalkContentsClientBridge::FromRenderFrameID(process_id_, render_frame_id);
 
   if ( client ) {
-    *did_overwrite = client->RewriteUrlIfNeeded(url, transition_type, new_url);
+    *did_overwrite = client->RewriteUrlIfNeeded(url, transition_type, isMainFrame, new_url);
   } else {
 #if TENTA_LOG_ENABLE == 1
     LOG(WARNING) << "Failed to find the associated render view host pocess_id="

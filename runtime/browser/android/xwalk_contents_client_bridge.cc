@@ -396,6 +396,7 @@ bool XWalkContentsClientBridge::ShouldOverrideUrlLoading(
  */
 bool XWalkContentsClientBridge::RewriteUrlIfNeeded(const std::string& url,
                                  ui::PageTransition transition_type,
+                                 bool isMainFrame,
                                  std::string* new_url) {
 #if TENTA_LOG_NET_ENABLE == 1
   LOG(INFO) << "XWalkContentsClientBridge::RewriteUrlIfNeeded " << url << " transition_type=" << transition_type;
@@ -414,6 +415,7 @@ bool XWalkContentsClientBridge::RewriteUrlIfNeeded(const std::string& url,
 
   jfieldID field_url = env->GetFieldID(jcls.obj(), "url", "Ljava/lang/String;");
   jfieldID field_tr_type = env->GetFieldID(jcls.obj(), "transitionType", "I");
+  jfieldID field_is_main_frame = env->GetFieldID(jcls.obj(), "isMainFrame", "Z");
 
   jmethodID ctor = MethodID::Get<MethodID::TYPE_INSTANCE>(env,
                                                           jcls.obj(),
@@ -426,6 +428,7 @@ bool XWalkContentsClientBridge::RewriteUrlIfNeeded(const std::string& url,
 
   env->SetIntField(new_obj, field_tr_type, transition_type);
   env->SetObjectField(new_obj, field_url, jurl.obj());
+  env->SetBooleanField(new_obj, field_is_main_frame, isMainFrame);
 
   // call java
   bool did_rewrite = Java_XWalkContentsClientBridge_rewriteUrlIfNeeded(

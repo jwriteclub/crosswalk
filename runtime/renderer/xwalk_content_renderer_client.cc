@@ -323,6 +323,7 @@ bool XWalkContentRendererClient::WillSendRequest(
   RenderThread::Get()->Send(new XWalkViewHostMsg_WillSendRequest(render_frame_id,
                                                                  url_str,
                                                                  transition_type,
+                                                                 render_frame->IsMainFrame(),
                                                                  &new_url_str,
                                                                  &did_overwrite));
 

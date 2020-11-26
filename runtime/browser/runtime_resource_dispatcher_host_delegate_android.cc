@@ -136,12 +136,10 @@ IoThreadClientThrottle::GetIoThreadClient() const {
 }
 
 void IoThreadClientThrottle::WillStartRequest(bool* defer) {
-  if (render_frame_id_ < 1) {
-    // OPTIONS is used for preflighted requests which are generated internally.
-    DCHECK_EQ("OPTIONS", request_->method());
-    return;
-  }
-  DCHECK(render_process_id_);
+  DCHECK_CURRENTLY_ON(BrowserThread::IO);
+  // valid render_frame_id_ implies nonzero render_processs_id_
+  DCHECK((render_frame_id_ < 1) || (render_process_id_ != 0));
+
   if (!MaybeDeferRequest(defer)) {
     MaybeBlockRequest();
   }

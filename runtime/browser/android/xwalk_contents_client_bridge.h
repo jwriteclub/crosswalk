@@ -83,7 +83,8 @@ class XWalkContentsClientBridge : public XWalkIconHelper::Listener {
                                  const std::string& realm);
   bool ShouldOverrideUrlLoading(const base::string16& url, bool has_user_gesture, bool is_redirect, bool is_main_frame);
 
-  bool RewriteUrlIfNeeded(const std::string& url, ui::PageTransition transition_type, std::string* new_url);
+  bool RewriteUrlIfNeeded(const std::string& url, ui::PageTransition transition_type, bool isMainFrame,
+                          std::string* new_url);
 
   void NewDownload(const GURL& url, const std::string& user_agent, const std::string& content_disposition,
                    const std::string& mime_type, int64_t content_length);
