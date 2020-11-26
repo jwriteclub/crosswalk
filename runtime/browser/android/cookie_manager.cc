@@ -288,8 +288,8 @@ CookieManager::CookieManager()
   // make MessageLoopForIO type!
   base::Thread::Options op(base::MessageLoop::Type::TYPE_IO, 0 /*default stack size*/);
   cookie_store_client_thread_.StartWithOptions(op);
-  cookie_store_task_runner_ = cookie_store_client_thread_.task_runner();
-//  cookie_store_task_runner_ = BrowserThread::GetTaskRunnerForThread(BrowserThread::IO);
+  // cookie_store_task_runner_ = cookie_store_client_thread_.task_runner();
+ cookie_store_task_runner_ = BrowserThread::GetTaskRunnerForThread(BrowserThread::IO);
 
   cookie_store_backend_thread_.Start();
   TENTA_LOG_COOKIE(INFO) << __func__ << " thread_id=" << cookie_store_client_thread_.GetThreadId();
