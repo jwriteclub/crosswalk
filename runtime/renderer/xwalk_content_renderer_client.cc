@@ -27,6 +27,8 @@
 #include "third_party/WebKit/public/platform/WebURLError.h"
 #include "third_party/WebKit/public/platform/WebURLRequest.h"
 #include "third_party/WebKit/public/web/WebDocument.h"
+#include "third_party/WebKit/public/web/WebDocumentLoader.h"
+#include "third_party/WebKit/public/web/WebNavigationType.h"
 #include "third_party/WebKit/public/web/WebSecurityPolicy.h"
 #include "third_party/WebKit/public/platform/modules/fetch/fetch_api_request.mojom-shared.h"
 #include "xwalk/application/common/constants.h"
@@ -299,37 +301,60 @@ bool XWalkContentRendererClient::WillSendRequest(
                        const blink::WebURL& url,
                        std::vector<std::unique_ptr<content::URLLoaderThrottle>>* throttles,
                        GURL* new_url) {
-  TENTA_LOG_NET(INFO) << "XWalkContentRendererClient::WillSendRequest doc_url="
-               << frame->GetDocument().Url().GetString().Utf8() << " url="
-               << url.GetString().Utf8();
+  blink::WebDocumentLoader* provisional_document_loader =
+      frame->GetProvisionalDocumentLoader();
+  blink::WebDocumentLoader* document_loader = provisional_document_loader
+                                           ? provisional_document_loader
+                                           : frame->GetDocumentLoader();
+
+  blink::WebNavigationType navigation_type = document_loader->GetNavigationType();
 #if defined(OS_ANDROID)
-  content::RenderView* render_view =
-      content::RenderView::FromWebView(frame->View());
-  if ( render_view == nullptr ) {
+  if (frame == nullptr) {
+    LOG(ERROR) << __func__ << " frame is NULL for url=" << GURL(url);
+    return false;
+  }
+  content::RenderView* render_view = content::RenderView::FromWebView(frame->View());
+  if (render_view == nullptr) {
+    LOG(WARNING) << __func__ << " render_view is NULL for url=" << GURL(url);
+    return false;  // no overwrite
+  }
+
+  GURL url_str(url);
+  GURL doc_url(frame->LocalRoot()->GetDocument().Url());
+
+  content::RenderFrame* render_frame = content::RenderFrame::FromWebFrame(frame);
+  bool isMainFrame = render_frame->IsMainFrame();
+
+  content::RenderFrame* main_render_frame = render_view->GetMainRenderFrame();
+  if ( main_render_frame == nullptr ) {
     return false; // no overwrite
   }
 
-  content::RenderFrame* render_frame = render_view->GetMainRenderFrame();
-  if ( render_frame == nullptr ) {
-    return false; // no overwrite
-  }
-
-  int render_frame_id = render_frame->GetRoutingID();
+  int render_frame_id = main_render_frame->GetRoutingID();
 
   bool did_overwrite = false;
-  std::string url_str = url.GetString().Utf8();
   std::string new_url_str;
 
+  TENTA_LOG_NET(INFO) << __func__ << " isMainFrame=" << isMainFrame
+      << " transition_type=" << transition_type
+      << " navigation_type=" << navigation_type
+      << " frameDocUrl=" << GURL(frame->GetDocument().Url())
+      << " doc_url=" << doc_url << " url=" << url_str
+                      << " site_for_cookies=" << frame->GetDocument().SiteForCookies().GetString().Utf8()
+                      << " security_origin=" << frame->GetDocument().GetSecurityOrigin().ToString().Utf8();
+
   RenderThread::Get()->Send(new XWalkViewHostMsg_WillSendRequest(render_frame_id,
-                                                                 url_str,
+                                                                 doc_url.spec(),
+                                                                 url_str.spec(),
                                                                  transition_type,
-                                                                 render_frame->IsMainFrame(),
+                                                                 navigation_type,
+                                                                 isMainFrame,
                                                                  &new_url_str,
                                                                  &did_overwrite));
 
   if ( did_overwrite ) {
     *new_url = GURL(new_url_str);
-    TENTA_LOG_NET(INFO) << "XWalkContentRendererClient::WillSendRequest did_overwrite";
+    TENTA_LOG_NET(INFO) << __func__ << " did_overwrite orig=" << url_str << " new_url=" << new_url_str;
   }
   return did_overwrite;
 #else

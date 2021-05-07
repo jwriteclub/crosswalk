@@ -338,7 +338,7 @@ XWalkContentsIoThreadClientImpl::ShouldInterceptRequest(
 
   JNIEnv* env = AttachCurrentThread();
   ScopedJavaLocalRef<jstring> jstring_url =
-      ConvertUTF8ToJavaString(env, location.spec());
+      ConvertUTF8ToJavaString(env, request->url().spec());
   ScopedJavaLocalRef<jstring> jstring_method =
       ConvertUTF8ToJavaString(env, request->method());
   ScopedJavaLocalRef<jobjectArray> jstringArray_headers_names =

@@ -394,13 +394,11 @@ bool XWalkContentsClientBridge::ShouldOverrideUrlLoading(
 /**
  *
  */
-bool XWalkContentsClientBridge::RewriteUrlIfNeeded(const std::string& url,
-                                 ui::PageTransition transition_type,
-                                 bool isMainFrame,
-                                 std::string* new_url) {
-#if TENTA_LOG_NET_ENABLE == 1
-  LOG(INFO) << "XWalkContentsClientBridge::RewriteUrlIfNeeded " << url << " transition_type=" << transition_type;
-#endif
+bool XWalkContentsClientBridge::RewriteUrlIfNeeded(const std::string& doc_url, const std::string& url,
+                                                   ui::PageTransition transition_type, int navigation_type,
+                                                   bool isMainFrame,
+                                                   std::string* new_url) {
+  TENTA_LOG_NET(INFO) << __func__ << " url=" << url << " transition_type=" << transition_type;
 
   JNIEnv* env = AttachCurrentThread();
   ScopedJavaLocalRef<jobject> obj = java_ref_.get(env);
@@ -413,8 +411,10 @@ bool XWalkContentsClientBridge::RewriteUrlIfNeeded(const std::string& url,
   ScopedJavaLocalRef<jclass> jcls = base::android::GetClass(
       env, "com/tenta/xwalk/refactor/RewriteUrlValue");
 
+  jfieldID field_doc_url = env->GetFieldID(jcls.obj(), "docUrl", "Ljava/lang/String;");
   jfieldID field_url = env->GetFieldID(jcls.obj(), "url", "Ljava/lang/String;");
   jfieldID field_tr_type = env->GetFieldID(jcls.obj(), "transitionType", "I");
+  jfieldID field_nav_type = env->GetFieldID(jcls.obj(), "navigationType", "I");
   jfieldID field_is_main_frame = env->GetFieldID(jcls.obj(), "isMainFrame", "Z");
 
   jmethodID ctor = MethodID::Get<MethodID::TYPE_INSTANCE>(env,
@@ -424,10 +424,13 @@ bool XWalkContentsClientBridge::RewriteUrlIfNeeded(const std::string& url,
   // create java object (!!!release local ref!!!)
   jobject new_obj = env->NewObject(jcls.obj(), ctor);
 
+  ScopedJavaLocalRef<jstring> jdocUrl = base::android::ConvertUTF8ToJavaString(env, doc_url);
   ScopedJavaLocalRef<jstring> jurl = base::android::ConvertUTF8ToJavaString(env, url);
 
-  env->SetIntField(new_obj, field_tr_type, transition_type);
+  env->SetObjectField(new_obj, field_doc_url, jdocUrl.obj());
   env->SetObjectField(new_obj, field_url, jurl.obj());
+  env->SetIntField(new_obj, field_tr_type, transition_type);
+  env->SetIntField(new_obj, field_nav_type, navigation_type);
   env->SetBooleanField(new_obj, field_is_main_frame, isMainFrame);
 
   // call java

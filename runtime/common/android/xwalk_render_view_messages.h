@@ -20,6 +20,9 @@
 #ifndef XWALK_RUNTIME_COMMON_ANDROID_XWALK_RENDER_VIEW_MESSAGES_H_
 #define XWALK_RUNTIME_COMMON_ANDROID_XWALK_RENDER_VIEW_MESSAGES_H_
 
+#define IPC_SYNC_MESSAGE_CONTROL6_2(msg, a, b, c, d, e, e2, f, g) \
+  IPC_SYNC_MESSAGE_CONTROL(msg, (a, b, c, d, e, e2), (f, g))
+
 namespace IPC {
 
 // TODO(upstream): - add enums and custom IPC traits here when needed.
@@ -132,10 +135,12 @@ IPC_SYNC_MESSAGE_CONTROL5_1(XWalkViewHostMsg_ShouldOverrideUrlLoading, // NOLINT
                             bool /* in - is_redirect */,
                             bool /* in - is_main_frame */,
                             bool /* out - result */)
-IPC_SYNC_MESSAGE_CONTROL4_2(XWalkViewHostMsg_WillSendRequest, // NOLINT(*)
+IPC_SYNC_MESSAGE_CONTROL6_2(XWalkViewHostMsg_WillSendRequest, // NOLINT(*)
                             int /* render_frame_id id */,
+                            std::string /* in - doc_url */,
                             std::string /* in - url */,
                             ui::PageTransition /*in - transition_type */,
+                            int /*in - navigation_type */,
                             bool /*in - isMainFrame*/,
                             std::string /* out - new url*/,
                             bool /* out - did_overwrite*/)

@@ -32,8 +32,10 @@ class XWalkRenderMessageFilter : public content::BrowserMessageFilter {
                                   bool is_redirect,
                                   bool is_main_frame,
                                   bool* ignore_navigation);
-  void OnWillSendRequest(int render_frame_id, const std::string& url,
+  void OnWillSendRequest(int render_frame_id, const std::string& doc_url,
+                         const std::string& url,
                          ui::PageTransition transition_type,
+                         int navigation_type,
                          bool isMainFrame,
                          std::string* new_url,
                          bool* did_overwrite);
